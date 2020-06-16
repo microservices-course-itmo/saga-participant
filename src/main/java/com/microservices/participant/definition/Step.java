@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SagaStepDefinitionDto {
+public class Step {
     private String sagaName;
 
     private String topicName;

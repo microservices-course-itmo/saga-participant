@@ -1,6 +1,6 @@
 package com.microservices.participant;
 
-import com.microservices.participant.definition.SagaStepDefinitionDto;
+import com.microservices.participant.definition.Step;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,19 +26,19 @@ public class KafkaClient {
     @Value("${spring.kafka.bootstrap-server}")
     private String brokers;
 
-    public void produce(SagaStepDefinitionDto definitionDto) {
+    public void produce(Step step) {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", brokers);
         properties.setProperty("key.serializer", SERIALIZER);
         properties.setProperty("value.serializer", SERIALIZER);
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
-        ProducerRecord<String, String> record = new ProducerRecord<>(definitionDto.getTopicName(), "hello");
+        ProducerRecord<String, String> record = new ProducerRecord<>(step.getTopicName(), "hello");
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.putLong(definitionDto.getSagaId());
+        buffer.putLong(step.getSagaId());
         record.headers().add(SAGA_ID_KEY, buffer.array());
-        record.headers().add(SAGA_NAME_KEY, definitionDto.getSagaName().getBytes());
+        record.headers().add(SAGA_NAME_KEY, step.getSagaName().getBytes());
         record.headers().add(EVENT_ID_KEY, buffer.array());
-        record.headers().add(EVENT_TYPE_KEY, definitionDto.getEventType().getBytes());
+        record.headers().add(EVENT_TYPE_KEY, step.getEventType().getBytes());
         producer.send(record);
     }
 }
